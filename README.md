@@ -4,7 +4,7 @@
 
 ## Game Description 
 
-The World and the people of `Gaia` once lived in unity. The world's key Spirits - elements of air, water, fire, and earch - maintained balance between human beings and nature. However, division, greed, and immorality corrupted Gaia's harmony and the Spirit's willingness to maintain balance. Currently, the Spirits hide in plain sight as corrupted and confused beings.
+The World and the people of `Gaia` once lived in unity. This world's key Spirits - elements of air, water, fire, and earch - maintained balance between human beings and nature. However, division, greed, and immorality corrupted Gaia's harmony and the Spirit's willingness to maintain balance. Currently, the Spirits hide in plain sight as corrupted and confused beings.
 
 As a player, you are a `Seeker`, divinely selected to connect with the Spirits and restore Gaia's balance. 
 
