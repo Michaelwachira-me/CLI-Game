@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Pipenv
+Pipfile.lock
+
+# Virtual environment
+.env
+.venv/
+
+# Alembic migrations cache
+migrations/__pycache__/
+migrations/versions/__pycache__/
+
+# pyenv Python version file
+.python-version
+
+# VSCode or IDE config (optional)
+.vscode/
+.idea/
