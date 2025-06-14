@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, JSON
 from sqlalchemy.orm import relationship
 
-from base import Base
+from .base import Base
 
 class PlayerMonster(Base):
     """
