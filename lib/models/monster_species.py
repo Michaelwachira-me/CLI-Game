@@ -20,4 +20,4 @@ class MonsterSpecies(Base):
     rarity = Column(String())
     abilities = Column(JSON)
     
-    player_monsters = relationship("PlayerMonster", back_populates="monster_species")
+    player_monsters = relationship("PlayerMonster", back_populates="monster_species", cascade="all, delete-orphan")

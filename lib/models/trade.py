@@ -13,6 +13,6 @@ class Trade(Base):
     requested_monsters = Column(JSON)
     status = Column(String, default="pending")
     
-    from_player = relationship("player", foreign_keys=[from_playerID])
-    to_player = relationship("player", foreign_keys=[to_playerID])
+    from_player = relationship("Player", foreign_keys=[from_playerID])
+    to_player = relationship("Player", foreign_keys=[to_playerID])
    

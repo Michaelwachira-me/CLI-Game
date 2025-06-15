@@ -17,8 +17,9 @@ class Battle(Base):
     result = Column(String)
     battle_inventory = Column(JSON, default=list)
     
-    player1 = relationship("player", foreign_keys=[player1_id])
-    player2 = relationship("player", foreign_keys=[player2_id])
+    player1 = relationship("Player", foreign_keys=[player1_id], back_populates="battles_as_player1")
+    player2 = relationship("Player", foreign_keys=[player2_id], back_populates="battles_as_player2")
+    
     
     def __repr__(self):
         return f"(Battle(id={self.id}, result={self.result}))"
