@@ -25,4 +25,5 @@ class PlayerMonster(Base):
     species_id = Column(Integer(), ForeignKey("monster_species.id"), nullable=False)
     player_id = Column(Integer(), ForeignKey("players.id"), nullable=False)
    
-    monster_species = relationship("MonsterSpecies", back_populates="player_monsters", cascade="all, delete-orphan")
+    monster_species = relationship("MonsterSpecies", back_populates="player_monsters")
+    player = relationship("Player", back_populates="monsters")

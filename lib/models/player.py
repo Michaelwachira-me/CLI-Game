@@ -14,7 +14,9 @@ class Player(Base):
     achievements = Column(JSON, default=list)
     
     monsters = relationship("PlayerMonster", back_populates="player")
-    battles = relationship("Battle", back_populates="player1")
+    battles_as_player1 = relationship("Battle", foreign_keys="Battle.player1_id", back_populates="player1")
+    battles_as_player2 = relationship("Battle", foreign_keys="Battle.player2_id", back_populates="player2")
+
     
     def __repr__(self):
         return f"<Player: username={self.username}, level={self.level}, xp={self.experience}"
