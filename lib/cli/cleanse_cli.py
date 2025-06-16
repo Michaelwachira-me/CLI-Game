@@ -44,7 +44,7 @@ def start():
         battle = create_battle(
             player1_id=player_id,
             player2_id=None,
-            monster_teams=[[chosen_monster.id]]
+            monster_teams=[[chosen_monster]]
         )
         battle_id = battle['battle_id']
 
