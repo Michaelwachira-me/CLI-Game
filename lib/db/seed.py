@@ -61,7 +61,7 @@ for player in players:
     playermonster = PlayerMonster(
         nickname=fake.unique.first_name(),
         level=fake.random_int(1, 5),
-        expertise=fake.random_int(0, 100),
+        experience=fake.random_int(0, 100),
         current_stats={"hp": 50},
         species_id=fake.random_element(elements=species_collection).id,
         player_id=player.id

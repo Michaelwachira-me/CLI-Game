@@ -19,7 +19,7 @@ class PlayerMonster(Base):
     id = Column(Integer(), primary_key=True)
     nickname = Column(String(), nullable=False, unique=True)
     level = Column(Integer(), default=1)
-    expertise = Column(Integer(), default=0)
+    experience = Column(Integer(), default=0)
     current_stats = Column(JSON)
     
     species_id = Column(Integer(), ForeignKey("monster_species.id"), nullable=False)
