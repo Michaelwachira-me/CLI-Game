@@ -3,6 +3,7 @@ import random
 from lib.models import Player, MonsterSpecies, PlayerMonster
 from lib.utilities.battle_system.create_battle import create_battle
 from lib.utilities.battle_system.combat_system import execute_turn, calculate_battle_rewards
+from lib.utilities.battle_system.battle_ui import display_turn, your_move_prompt, show_move_result, show_separator
 from lib.db.connection import Session
 from sqlalchemy.sql import func
 
@@ -66,12 +67,15 @@ def start():
         turn = 1
 
         while corrupted_hp > 0 and chosen_monster.current_stats["hp"] > 0:
-            typer.echo(f"\nTurn {turn}: {chosen_monster.nickname} vs corrupted {corrupted_spirit.name}")
-
-            typer.echo("1. Spirit Strike")
-            typer.echo("2. Guard")
-
-            move_choice = int(typer.prompt("Choose your move"))
+            show_separator()
+            display_turn(
+                chosen_monster.nickname, 
+                chosen_monster.current_stats["hp"],
+                f"Corrupted {corrupted_spirit.name}",
+                corrupted_hp
+            )
+            
+            move_choice = your_move_prompt()
 
             if move_choice == 1:
                 move = {"name": "Spirit Strike", "power": 2.0, "type_effectiveness": 1.0}
@@ -91,13 +95,18 @@ def start():
 
             # Update local HP for next loop
             corrupted_hp = corrupted_spirit.current_stats["hp"]
-            typer.echo(result["log"])
+            show_move_result(
+                chosen_monster.nickname, 
+                f"Corrupted {corrupted_spirit.name}", 
+                move["name"], result["damage"], corrupted_hp)
             
             # If corrupted spirit fainted, skip counterattack
             if corrupted_hp <= 0:
                 break
             
+            show_separator()
             # Now corrupted spirit counterattacks!
+            typer.secho(f" Corrupted Spirit's Move:", fg=typer.colors.BRIGHT_RED, bold=True)
             spirit_moves = [
                     {"name": "Corrupted Blast", "power": 1.5, "type_effectiveness": 1.0},
                     {"name": "Dark Mist", "power": 1.0, "type_effectiveness": 1.0}
@@ -105,8 +114,11 @@ def start():
             spirit_move = random.choice(spirit_moves)
             
             result = execute_turn(battle_id, corrupted_spirit, chosen_monster, spirit_move)
-            typer.echo(f"The corrupted spirit strikes back!\n{result['log']}")
-
+            show_move_result(
+                f"Corrupted {corrupted_spirit.name} strikes back!", chosen_monster.nickname, spirit_move["name"], 
+                result["damage"], chosen_monster.current_stats["hp"]
+                )
+            
             turn += 1
 
         # Remove temp attribute

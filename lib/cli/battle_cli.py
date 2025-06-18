@@ -6,7 +6,12 @@ from lib.models import Player
 from lib.utilities.battle_system.create_battle import create_battle
 from lib.utilities.battle_system.combat_system import execute_turn, calculate_battle_rewards
 from lib.utilities.player_system.create_player import create_player, login_player
-
+from lib.utilities.battle_system.battle_ui import (
+    show_separator, 
+    display_turn, 
+    your_move_prompt, 
+    show_move_result
+)
 app = typer.Typer()
 session = Session()
 
@@ -25,12 +30,14 @@ def pvp():
     Challenge another player to a battle.
     """
     try:
+        # authenticate player 
         typer.secho("\n=== LOGIN ===", fg=typer.colors.CYAN, bold=True)
         username = typer.prompt("Your username")
         password = typer.prompt("Your password", hide_input=True)
         player = login_player(username, password)
         typer.secho(f"\n Welcome back, {player.username}!", fg=typer.colors.GREEN, bold=True)
 
+        # Find player's opponent
         typer.secho("\n=== CHALLENGE AN OPPONENT ===", fg=typer.colors.CYAN, bold=True)
         opponent_username = typer.prompt("Enter opponent's username")
 
@@ -45,6 +52,7 @@ def pvp():
             bold=True,
         )
         
+        # Both player pick their monster spirits
         typer.secho("\n=== YOUR MONSTERS ===", fg=typer.colors.CYAN, bold=True)
         for idx, m in enumerate(player.monsters, 1):
             typer.echo(f"{idx}. {m.nickname} (Lv.{m.level})")
@@ -53,7 +61,7 @@ def pvp():
         chosen_monster = player.monsters[chosen_index]
         chosen_monster.initialize_current_stats()
         
-        # Opponent's strongest
+        # system picks the Opponent's best monster
         opponent_monster = max(opponent.monsters, key=lambda m: m.level)
         opponent_monster.initialize_current_stats()
         typer.secho(
@@ -75,42 +83,64 @@ def pvp():
 
         typer.secho("\n BATTLE STARTS! ", fg=typer.colors.GREEN, bold=True)
 
+        # Initialize battle loop=> players taking turns till one wins
         turn = 1
         while chosen_monster.current_stats["hp"] > 0 and opponent_monster.current_stats["hp"] > 0:
-            typer.secho("\n" + "="*30, fg=typer.colors.BLUE)
-            typer.secho(f" TURN {turn}", fg=typer.colors.BLUE, bold=True)
-            typer.echo(f" Your {chosen_monster.nickname} HP: {chosen_monster.current_stats['hp']}")
-            typer.echo(f" {opponent.username}'s {opponent_monster.nickname} HP: {opponent_monster.current_stats['hp']}")
+            show_separator()
+            
+            typer.secho(f" BATTLE ROUND {turn} ", fg=typer.colors.BLUE, bold=True)
+            # display turns via helper func.
+            display_turn(
+                chosen_monster.nickname,
+                chosen_monster.current_stats["hp"],
+                opponent_monster.nickname,
+                opponent_monster.current_stats["hp"]
+            )
 
-            typer.echo("\n Your Move:")
-            typer.echo("1.  Attack")
-            typer.echo("2.  Defend")
-            move_choice = int(typer.prompt("Choose move (1 or 2)"))
-
+            # propmt player to make a move via helper func
+            move_choice = your_move_prompt()
+            
             player_move = {
                 "name": "Attack", "power": 1.5, "type_effectiveness": 1.0
             } if move_choice == 1 else {
                 "name": "Defend", "power": 0.5, "type_effectiveness": 1.0
             }
 
+            # Execute player1' turn and show results using battle_ui's helper func.
             result = execute_turn(battle_id, chosen_monster, opponent_monster, player_move)
-            typer.echo(result["log"])
-
+            show_move_result(
+                chosen_monster.nickname,
+                opponent_monster.nickname,
+                player_move["name"],
+                result["damage"],
+                opponent_monster.current_stats["hp"]
+            )
+            # typer.echo(result["log"])
+            
+            # If opponent is defeated, break loop
             if opponent_monster.current_stats["hp"] <= 0:
                 break
 
             # Opponent AI move
-            typer.echo(f"\n {opponent.username}'s Move:")
+            typer.secho(f" {opponent.username}'s turn:", fg=typer.colors.BRIGHT_RED, bold=True)
             opponent_move = random.choice([
                 {"name": "Attack", "power": 1.5, "type_effectiveness": 1.0},
                 {"name": "Defend", "power": 0.5, "type_effectiveness": 1.0}
             ])
             result = execute_turn(battle_id, opponent_monster, chosen_monster, opponent_move)
-            typer.echo(result["log"])
+            # typer.echo(result["log"])
+            show_move_result(
+                opponent_monster.nickname,
+                chosen_monster.nickname,
+                opponent_move["name"],
+                result["damage"],
+                chosen_monster.current_stats["hp"]
+            )
 
-            turn += 1
+            turn += 1 #continue rounds till a winner arises
 
-        # Winner plus rewarding
+        # anounce winner and reward
+        show_separator()
         if chosen_monster.current_stats["hp"] > 0:
             xp, money = calculate_battle_rewards(player.id, battle_difficulty=2)
             typer.secho(f"\n YOU WIN! {opponent.username} is defeated!", fg=typer.colors.GREEN, bold=True)
