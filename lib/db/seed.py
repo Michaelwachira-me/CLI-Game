@@ -20,7 +20,11 @@ for _ in range(6):
     species = MonsterSpecies(
         name=fake.unique.word().capitalize(),
         element_type=fake.random_element(elements=('Fire', 'Water', 'Earth', 'Air')),
-        base_stats={"hp": fake.random_int(10, 100)},
+        base_stats={
+            "hp": fake.random_int(30, 100),
+            "attack": fake.random_int(5, 20),
+            "defense": fake.random_int(5, 20)
+        },
         rarity=fake.random_element(elements=('normal', 'rare', 'Elite', 'godslayer')),
         abilities=[fake.word() for _ in range(2)]
     )
@@ -58,14 +62,15 @@ session.commit()
 player_monsters = []
 player_achievements = []
 for player in players:
+    species = fake.random_element(elements=species_collection)
     playermonster = PlayerMonster(
         nickname=fake.unique.first_name(),
         level=fake.random_int(1, 5),
         experience=fake.random_int(0, 100),
-        current_stats={"hp": 50},
-        species_id=fake.random_element(elements=species_collection).id,
+        monster_species=species,
         player_id=player.id
     )
+    playermonster.initialize_current_stats() #uses species.base_stats
     player_monsters.append(playermonster)
 
     playerAchievmt = Player_achievement(
