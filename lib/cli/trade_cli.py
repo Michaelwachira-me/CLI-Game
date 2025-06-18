@@ -1,6 +1,6 @@
 import typer
 from lib.utilities.trade_system.trade_dynamics import propose_trade
-from lib.utilities.catch_monster import get_player_collection
+from lib.utilities.monster_system.catch_monster import get_player_collection
 from lib.models import Player
 from lib.db.connection import Session
 

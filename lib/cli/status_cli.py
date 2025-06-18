@@ -1,5 +1,5 @@
 import typer
-from lib.utilities.catch_monster import get_player_collection
+from lib.utilities.monster_system.catch_monster import get_player_collection
 from lib.db.connection import Session
 from lib.models import Player
 
@@ -17,13 +17,17 @@ def show():
 
         typer.secho(f"\n Seeker: {player.username}", fg=typer.colors.CYAN)
         typer.echo(f"Level: {player.level}")
-        typer.echo(f"Coins: {player.coins}")
+        typer.echo(f"money: {player.money}")
         typer.echo(f"XP: {player.experience}")
 
         typer.secho("\n Spirit Team:", fg=typer.colors.GREEN)
         collection = get_player_collection(player_id)
-        for mon in collection:
-            typer.echo(f"- {mon['nickname']} (Lv.{mon['level']}) Trust: {mon['expertise']}")
-
+        
+        if collection:
+            for mon in collection:
+                typer.echo(f"- {mon.nickname} (Lv.{mon.level}) Trust: {mon.experience}")
+        else:
+            typer.secho("You have no bonded spirits yet. Explore Gaia more.")
+            
     except Exception as e:
         typer.secho(f"  Error fetching status: {e}", fg=typer.colors.RED)

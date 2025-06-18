@@ -1,13 +1,13 @@
 import typer
 
 from .explore_cli import app as explore_app
-from .cleanse_cli import app as cleanse_app
+from .battle_cli import app as battle_app
 from .bond_cli import app as bond_app
 from .trade_cli import app as trade_app
 from .status_cli import app as status_app
 
 from .menus.explore_menu import explore_menu
-from .menus.cleanse_menu import cleanse_menu
+from .menus.battle_menu import battle_menu
 from .menus.bond_menu import bond_menu
 from .menus.trade_menu import trade_menu
 from .menus.status_menu import status_menu
@@ -17,7 +17,7 @@ app = typer.Typer()
 
 # Add subcommands
 app.add_typer(explore_app, name="explore", help="Venture into Gaia to calm lost spirits.")
-app.add_typer(cleanse_app, name="cleanse", help="Cleanse corrupted spirits through battles.")
+app.add_typer(battle_app, name="battle", help="Cleanse corrupted spirits through battles.")
 app.add_typer(bond_app, name="bond", help="Bond with your spirits to grow stronger.")
 app.add_typer(trade_app, name="trade", help="Propose a trade.")
 app.add_typer(status_app, name="status", help="View your Seeker's spirit collection and harmony status.")
@@ -31,7 +31,7 @@ def run():
         clear_screen()
         typer.secho("\n=== Gaia Restoration ===", fg=typer.colors.CYAN, bold=True)
         typer.echo("1. Explore Gaia")
-        typer.echo("2. Cleanse Corruption (Battle)")
+        typer.echo("2. Battle")
         typer.echo("3. Bond with Spirits")
         typer.echo("4. Propose a Trade")
         typer.echo("5. Check Seeker Status")
@@ -42,7 +42,7 @@ def run():
         if choice == '1':
             explore_menu()
         elif choice == '2':
-            cleanse_menu()
+            battle_menu()
         elif choice == '3':
             bond_menu()
         elif choice == '4':

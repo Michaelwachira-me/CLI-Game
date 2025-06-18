@@ -1,8 +1,8 @@
 import typer
 from lib.models import Player
 from lib.db.connection import Session
-from lib.utilities.catch_monster import get_player_collection
-from lib.utilities.leveling_system import level_up_monster
+from lib.utilities.monster_system.catch_monster import get_player_collection
+from lib.utilities.monster_system.leveling_system import level_up_monster
 
 app = typer.Typer()
 session = Session()

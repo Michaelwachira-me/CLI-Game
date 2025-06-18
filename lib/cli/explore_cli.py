@@ -1,8 +1,8 @@
 import typer
 from sqlalchemy.sql import func
 from lib.models import Player, MonsterSpecies
-from lib.utilities.catch_rate import calculate_catch_rate
-from lib.utilities.catch_monster import catch_monster
+from lib.utilities.monster_system.catch_rate import calculate_catch_rate
+from lib.utilities.monster_system.catch_monster import catch_monster
 from lib.db.connection import Session
 
 app = typer.Typer()
