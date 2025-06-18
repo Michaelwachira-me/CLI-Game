@@ -1,11 +1,14 @@
 import typer
+import time
 import random
 from lib.models import Player, MonsterSpecies, PlayerMonster
 from lib.utilities.battle_system.create_battle import create_battle
 from lib.utilities.battle_system.combat_system import execute_turn, calculate_battle_rewards
 from lib.utilities.battle_system.battle_ui import display_turn, your_move_prompt, show_move_result, show_separator
+from lib.utilities.player_system.create_player import login_player
 from lib.db.connection import Session
 from sqlalchemy.sql import func
+from lib.utilities.clear_screen import clear_screen
 
 app = typer.Typer()
 session = Session()
@@ -15,16 +18,33 @@ def start():
     """
     Cleanse a corrupted spirit by battling with your own monster.
     """
-
+    typer.echo("\n--- Corrupted Grove: Where Shadows Linger ---")
+    time.sleep(1)
+    
     try:
-        player_id = 1 #For now, I am using player 1
-        player = session.query(Player).get(player_id)
+        # Login for player
+        typer.secho("\n=== LOGIN ===", fg=typer.colors.CYAN, bold=True)
+        username = typer.prompt("Your username")
+        password = typer.prompt("Your password", hide_input=True)
+
+        player = login_player(username, password)
+        clear_screen()
+        
+        # game narrative to improve UI
+        typer.secho(f"\nWelcome, {player.username}. Your inner harmony radiates at level {player.level}.", fg=typer.colors.BLUE) 
+        time.sleep(1)
+        
+        typer.echo("\nDark winds twist the grove around you...")
+        time.sleep(1.5)
 
         # Pick a random corrupted spirit species
         corrupted_spirit = session.query(MonsterSpecies).order_by(func.random()).first()
 
-        typer.secho(f"\nA corrupted spirit appears: {corrupted_spirit.name} ({corrupted_spirit.element_type})!", fg=typer.colors.RED)
-
+        typer.secho(f"\nA corrupted spirit appears: {corrupted_spirit.name} ({corrupted_spirit.element_type})!", fg=typer.colors.BLACK, bold=True)
+        time.sleep(1)
+        
+        typer.secho("\nThrough cleansing, you release its pain — restoring your harmony and the grove's purity.", fg=typer.colors.BRIGHT_BLACK, bold=True)
+        time.sleep(1)
         # Get player's monsters, 
         # and initialize its current_stats if absent
         player_team = player.monsters
@@ -33,10 +53,10 @@ def start():
                  monster.initialize_current_stats()
 
         if not player_team:
-            typer.echo("You have no monsters! Go explore Gaia first.")
+            typer.secho("You have no monsters! Go explore Gaia first.", fg=typer.colors.YELLOW)
             return
 
-        typer.echo("\nChoose your monster for battle:")
+        typer.secho("\nChoose your monster for battle:", fg=typer.colors.BRIGHT_BLACK, bold=True)
 
         for index, monster in enumerate(player_team, start=1):
             typer.echo(f"{index}. {monster.nickname} (Level {monster.level}) HP: {monster.current_stats['hp']}")
@@ -46,10 +66,11 @@ def start():
         
         # Reinitialize chosen_monster's current_stats freshly for this battle
         chosen_monster.initialize_current_stats()
+        time.sleep(1.5)
 
         # Create battle (store only your monster's ID — spirit needs no DB)
         battle = create_battle(
-            player1_id=player_id,
+            player1_id=player.id,
             player2_id=None,
             monster_teams={
                 "player1": [chosen_monster.id],
@@ -57,7 +78,7 @@ def start():
             }
         )
 
-        typer.echo("\nThe cleansing battle begins!")
+        typer.secho("\n===The cleansing battle begins!===", fg=typer.colors.BRIGHT_BLACK, bold=True,)
 
         battle_id = battle["battle_id"]
 
