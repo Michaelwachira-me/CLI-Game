@@ -1,5 +1,5 @@
 import typer
-from lib.cli.battle_cli import cleanse, pvp
+from lib.cli.battle_cli.battle_cli import cleanse, pvp
 from lib.utilities.clear_screen import clear_screen
 
 def battle_menu():
