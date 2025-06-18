@@ -1,8 +1,8 @@
-"""Initial tables
+"""Migrations with the right columns.
 
-Revision ID: 427bf115a9ad
+Revision ID: 88a372678e19
 Revises: 
-Create Date: 2025-06-15 17:32:36.296376
+Create Date: 2025-06-18 15:34:41.175526
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '427bf115a9ad'
+revision: str = '88a372678e19'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -66,14 +66,13 @@ def upgrade() -> None:
     sa.Column('progress', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['achievement_id'], ['achievements.id'], name=op.f('fk_player_achievements_achievement_id_achievements')),
     sa.ForeignKeyConstraint(['player_id'], ['players.id'], name=op.f('fk_player_achievements_player_id_players')),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('player_monsters',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nickname', sa.String(), nullable=False),
     sa.Column('level', sa.Integer(), nullable=True),
-    sa.Column('expertise', sa.Integer(), nullable=True),
+    sa.Column('experience', sa.Integer(), nullable=True),
     sa.Column('current_stats', sa.JSON(), nullable=True),
     sa.Column('species_id', sa.Integer(), nullable=False),
     sa.Column('player_id', sa.Integer(), nullable=False),

@@ -48,13 +48,13 @@ session.add_all(players)
 session.commit()
 
 # create achievements
-achievements = []
-for _ in range(4):
-    achievement = Achievement(
-        name=fake.unique.word().capitalize(),
-        description=fake.sentence()
-    )
-    achievements.append(achievement)
+achievements = [
+    Achievement(name="Spirit Whisperer", description="Holistically bonded with lost spirits."),
+    Achievement(name="Corruption Cleanser", description="Prioritized cleansing exercise."),
+    Achievement(name="Gaia Explorer", description="Explored all known regions."),
+    Achievement(name="Master Tamer", description="Raise a spirit to new level.")
+]
+
 session.add_all(achievements)
 session.commit()
 
@@ -62,27 +62,31 @@ session.commit()
 player_monsters = []
 player_achievements = []
 for player in players:
-    species = fake.random_element(elements=species_collection)
-    playermonster = PlayerMonster(
-        nickname=fake.unique.first_name(),
-        level=fake.random_int(1, 5),
-        experience=fake.random_int(0, 100),
-        monster_species=species,
-        player_id=player.id
-    )
-    playermonster.initialize_current_stats() #uses species.base_stats
-    player_monsters.append(playermonster)
+    num_monsters = fake.random_int(1, 3)
+    for _ in range(num_monsters):
+        species = fake.random_element(elements=species_collection)
+        playermonster = PlayerMonster(
+            nickname=fake.unique.first_name(),
+            level=fake.random_int(1, 5),
+            experience=fake.random_int(0, 100),
+            monster_species=species,
+            player_id=player.id
+        )
+        session.add(playermonster)
+        session.flush() # Flush so SQLAlchemy assigns IDs and relationships
+        playermonster.initialize_current_stats() #uses species.base_stats
+        player_monsters.append(playermonster)
 
+    achievement = fake.random_element(elements=achievements)
     playerAchievmt = Player_achievement(
-        name=fake.word(), 
+        name=achievement.name, 
         player_id=player.id,
-        achievement_id=fake.random_element(elements=achievements).id,
-        progress=round(fake.pyfloat(0, 1), 2)
+        achievement_id=achievement.id,
+        progress=round(fake.random_element(elements=[0.2, 0.5, 1.0]), 2)
     )
+    session.add(playerAchievmt)
     player_achievements.append(playerAchievmt)
 
-session.add_all(player_monsters)
-session.add_all(player_achievements)
 session.commit()
 
 # create battles 
@@ -101,14 +105,17 @@ session.add_all(battles_list)
 session.commit()
 
 # create trades
+all_monsters = session.query(PlayerMonster).all()
 trades_list = []
 for _ in range(3):
     from_player, to_player = fake.random_elements(elements=players, length=2, unique=True)
+    offered = [fake.random_element(elements=all_monsters).id for _ in range(1)]
+    requested = [fake.random_element(elements=all_monsters).id for _ in range(1)]
     trade = Trade(
         from_playerID=from_player.id,
         to_playerID=to_player.id,
-        offered_monsters=[fake.word() for _ in range(2)],
-        requested_monsters=[fake.word() for _ in range(1)],
+        offered_monsters=offered,
+        requested_monsters=requested,
         status=fake.random_element(elements=('Pending', 'Accepted', 'Declined'))
     )
     trades_list.append(trade)
