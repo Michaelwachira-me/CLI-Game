@@ -27,3 +27,14 @@ class PlayerMonster(Base):
    
     monster_species = relationship("MonsterSpecies", back_populates="player_monsters")
     player = relationship("Player", back_populates="monsters")
+    
+    def initialize_current_stats(self):
+        """
+        Reset this monster's battle stats based on its species base stats.
+        """
+        base_stats = self.monster_species.base_stats
+        self.current_stats = {
+            "hp": base_stats["hp"],
+            "attack": base_stats["attack"],
+            "defense": base_stats["defense"]
+        }
