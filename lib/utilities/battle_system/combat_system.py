@@ -1,4 +1,5 @@
 from lib.models import Battle, Player
+from lib.utilities.monster_system.name_getter import get_monster_name
 from lib.db.connection import Session
 import random
 
@@ -26,43 +27,93 @@ def calculate_damage(attacker_stats:dict, defender_stats:dict, move_power, type_
     
     # input randomness so that damage slightly differs like in pokemon
     random_value = random.uniform(0.7, 1.0)
-    total_damage = total_damage * random
+    total_damage = total_damage * random_value
     
     return int(total_damage)
 
 def execute_turn(battle_id, attacker_monster, defender_monster, move) -> dict:
     """
-    -Takes attacker and defender monster (including their stats)
-    - applies Move - ie. type/power 
-    -then calculates damage, updates state and stores
+    attacker_monster and defender_monster are ORM objects:
+        - so, extracts stats into dicts, then calls calculate_damage
+    - PlayerMonster has .current_stats
+    - MonsterSpecies has .base_stats
     """
+
+    # Get attacker stats
+    if hasattr(attacker_monster, "current_stats"):
+        attacker_stats = {
+            "name": get_monster_name(attacker_monster),
+            "attack": attacker_monster.current_stats["attack"],
+            "defense": attacker_monster.current_stats["defense"],
+            "current_hp": attacker_monster.current_stats["hp"]
+        }
+    else:
+        attacker_stats = {
+            "name": get_monster_name(attacker_monster),
+            "attack": attacker_monster.base_stats["attack"],
+            "defense": attacker_monster.base_stats["defense"],
+            "current_hp": attacker_monster.base_stats["hp"]
+        }
+
+    # Extract defender stats
+    if hasattr(defender_monster, "current_stats"):
+        defender_stats = {
+            "name": get_monster_name(defender_monster),
+            "attack": defender_monster.current_stats["attack"],
+            "defense": defender_monster.current_stats["defense"],
+            "current_hp": defender_monster.current_stats["hp"]
+        }
+    else:
+        defender_stats = {
+            "name": get_monster_name(defender_monster),
+            "attack": defender_monster.base_stats["attack"],
+            "defense": defender_monster.base_stats["defense"],
+            "current_hp": defender_monster.base_stats["hp"]
+        }
+
+
+    # Calculate damage
     damage = calculate_damage(
-        attacker_monster, defender_monster, move['power'], move['type_effectiveness'] 
+        attacker_stats,
+        defender_stats,
+        move['power'],
+        move['type_effectiveness']
     )
-    
-    # minus damage from defender
-    defender_monster['current_hp'] -= damage
-    if defender_monster['current_hp'] < 0:
-        defender_monster['current_hp'] = 0
-    
-    # append the turn to session
+
+    # Subtract HP in local stats
+    defender_stats['current_hp'] -= damage
+    if defender_stats['current_hp'] < 0:
+        defender_stats['current_hp'] = 0
+
+    # Update above stats to ORM object
+    if hasattr(defender_monster, "current_stats"):
+        defender_monster.current_stats["hp"] = defender_stats['current_hp']
+    else:
+        # MonsterSpecies doesn't store HP in DB
+        pass
+
+    session.commit()
+
+    # Log turn in Battle
     battle = session.query(Battle).get(battle_id)
     battle.battle_inventory.append({
         "turn": {
-            "attacker": attacker_monster['name'],
-            "defender": defender_monster['name'],
+            "attacker": attacker_stats['name'],
+            "defender": defender_stats['name'],
             "move": move['name'],
-            "damage": damage, 
-            "defender_hp": defender_monster['current_hp']
+            "damage": damage,
+            "defender_hp": defender_stats['current_hp']
         }
     })
     session.commit()
+
     return {
         "damage": damage,
-        "defender_hp": defender_monster['current_hp'],
-        "log": battle.battle_inventory[-1]
-    }
-    
+        "defender_hp": defender_stats['current_hp'],
+        "log": f"{attacker_stats['name']} used {move['name']} and dealt {damage} damage! "
+            f"{defender_stats['name']} has {defender_stats['current_hp']} HP left."
+       }
+   
 def check_battle_end(battle_id) -> bool:
     """
     Check if the battle should end — for example, if all monsters 

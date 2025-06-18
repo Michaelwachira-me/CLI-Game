@@ -1,4 +1,5 @@
 import typer
+import random
 from lib.models import Player, MonsterSpecies, PlayerMonster
 from lib.utilities.battle_system.create_battle import create_battle
 from lib.utilities.battle_system.combat_system import execute_turn, calculate_battle_rewards
@@ -15,7 +16,7 @@ def start():
     """
 
     try:
-        player_id = 1  # TODO: in real game, get player dynamically
+        player_id = 1 #For now, I am using player 1
         player = session.query(Player).get(player_id)
 
         # Pick a random corrupted spirit species
@@ -51,7 +52,7 @@ def start():
             player2_id=None,
             monster_teams={
                 "player1": [chosen_monster.id],
-                "corrupted": [corrupted_spirit.id]  # optional
+                "corrupted": [corrupted_spirit.id]
             }
         )
 
@@ -84,17 +85,31 @@ def start():
                 "hp": corrupted_hp
             }
 
+            # Player moves on corrupted spirit
             # Call turn
             result = execute_turn(battle_id, chosen_monster, corrupted_spirit, move)
 
             # Update local HP for next loop
             corrupted_hp = corrupted_spirit.current_stats["hp"]
-
             typer.echo(result["log"])
+            
+            # If corrupted spirit fainted, skip counterattack
+            if corrupted_hp <= 0:
+                break
+            
+            # Now corrupted spirit counterattacks!
+            spirit_moves = [
+                    {"name": "Corrupted Blast", "power": 1.5, "type_effectiveness": 1.0},
+                    {"name": "Dark Mist", "power": 1.0, "type_effectiveness": 1.0}
+                ]
+            spirit_move = random.choice(spirit_moves)
+            
+            result = execute_turn(battle_id, corrupted_spirit, chosen_monster, spirit_move)
+            typer.echo(f"The corrupted spirit strikes back!\n{result['log']}")
 
             turn += 1
 
-        # Remove temp attribute (optional)
+        # Remove temp attribute
         if hasattr(corrupted_spirit, "current_stats"):
             del corrupted_spirit.current_stats
 
