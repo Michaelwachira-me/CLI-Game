@@ -99,7 +99,19 @@ def pvp():
 
             # propmt player to make a move via helper func
             move_choice = your_move_prompt()
-            
+                # Since move_choices are 3 -> Attack, Defend, Surrender
+                    # Handle the case where the player surrenders:
+            if move_choice == 3:
+                typer.secho("\n You chose to surrender!", fg=typer.colors.RED, bold=True)
+                xp, money = calculate_battle_rewards(opponent.id, battle_difficulty=2)
+                typer.secho(
+                    f"{opponent.username} wins by forfeit! +{xp} XP, +{money} coins.",
+                    fg=typer.colors.YELLOW, bold=True
+                )
+                typer.secho("Returning to Battle Menu...", fg=typer.colors.BRIGHT_BLUE)
+                return
+                
+            # otherwise, if player chooses Attack or Defend, pick move:
             player_move = {
                 "name": "Attack", "power": 1.5, "type_effectiveness": 1.0
             } if move_choice == 1 else {

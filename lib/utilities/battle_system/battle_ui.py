@@ -30,7 +30,8 @@ def your_move_prompt():
     typer.secho(" You have the choice to attack or defend:", fg=typer.colors.BRIGHT_BLUE, bold=True)
     typer.echo("1.  Attack")
     typer.echo("2.  Defend")
-    move = typer.prompt("Choose your move (1 or 2)").strip()
+    typer.echo("3. Surrender (End Battle)")
+    move = int(typer.prompt("Choose your move (1 or 2 or 3)").strip())
     return move
 
 def show_move_result(attacker, defender, move_name, damage, defender_hp):

@@ -76,7 +76,14 @@ def start():
             )
             
             move_choice = your_move_prompt()
-
+                # Since move_choices are 3 -> Attack, Defend, Surrender
+                    # Handle the case where the player surrenders:
+            if move_choice == 3:
+                typer.secho("\n You fled the battle. The corruption persists...", fg=typer.colors.RED, bold=True)
+                typer.secho("Returning to Battle Menu...", fg=typer.colors.BRIGHT_BLUE)
+                return
+              
+            # otherwise, if player chooses Attack or Defend, pick move:
             if move_choice == 1:
                 move = {"name": "Spirit Strike", "power": 2.0, "type_effectiveness": 1.0}
             else:

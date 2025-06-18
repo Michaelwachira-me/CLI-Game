@@ -7,7 +7,7 @@ def battle_menu():
         clear_screen()
         typer.secho("\n=== BATTLE MENU ===", fg=typer.colors.CYAN, bold=True)
         typer.echo("1. Cleanse Corruption (vs AI)")
-        typer.echo("2. Challenge a Seeker (PVP)")
+        typer.echo("2. Challenge a Seeker")
         typer.echo("3. Back to Main Menu")
 
         choice = typer.prompt("Enter option (1-3)").strip()
