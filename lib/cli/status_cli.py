@@ -31,7 +31,7 @@ def show():
             username = typer.prompt("Your username")
             password = typer.prompt("Your password", hide_input=True)
 
-            player = login_player(username, password)
+            player = login_player(username, password, session)
             clear_screen()
 
             typer.secho(f"\nSeeker: {player.username}", fg=typer.colors.BRIGHT_CYAN)
@@ -41,7 +41,7 @@ def show():
 
             # Spirits
             typer.secho("\nBonded Spirits:", fg=typer.colors.GREEN)
-            collection = get_player_collection(player.id)
+            collection = get_player_collection(player.id, session)
             if collection:
                 for mon in collection:
                     typer.echo(f"- {mon.nickname} (Lv.{mon.level}) Trust: {mon.experience}")

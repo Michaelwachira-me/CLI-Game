@@ -20,6 +20,10 @@ Rather than trying to conquer the Monster, can you make the difficult decisions 
 
 ***
 
+## GAME DEMO
+Before engaging with the game on a development-basis, follow the video attached to understand the social embodiment and playing mechanics: https://www.loom.com/share/60c4bbf46e354c469acf85c35e0a2f61?sid=49026ab5-473e-41bc-b4a8-67c505774eb2 
+
+
 ## Features
 
 - Explore Gaia’s mystical regions  
